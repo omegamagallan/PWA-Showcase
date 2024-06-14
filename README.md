@@ -1,2 +1,2 @@
 # pwa-server-project
-Server for web application
+Server of the web application

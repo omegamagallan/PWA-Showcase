@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+    <div class="position-relative">
+      <div class="position-absolute top-0 start-50 translate-middle-x row" style="width: 70%">
+        <div class="col col-lg-2" style="padding: 50px">
+          <div class="card" style="width: 18rem; background: #CDE7E3">
+            <img src="https://global.discourse-cdn.com/business7/uploads/plot/original/3X/f/6/f66e11597255b3c333ae578d3e15fc3c6e7fe998.jpeg" class="card-img-top object-fit-cover" alt="plotly">
+            <div class="card-body" style="padding: 20px">
+              <h5 style="text-align: left" class="card-title">Integrated Graphics</h5>
+              <p style="text-align: left" class="card-text">You can try to plot wonderful graphics</p>
+              <hr class="my-4">
+              <p class="lead" style="text-align: left">
+                <a class="btn btn-lg" style="background: #CDE7E3" href="/code" role="button">Try plotter</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col col-lg-2" style="padding: 50px">
+          <div class="card" style="width: 18rem; background: #CDE7E3">
+            <img src="https://cdn-content.qualisys.com/2015/10/osc-3890-430x430.jpg" class="card-img-top object-fit-cover" alt="osc">
+            <div class="card-body" style="padding: 20px">
+              <h5 style="text-align: left" class="card-title">OSC Messages</h5>
+              <p style="text-align: left" class="card-text">Try to send or receive a message to another device in local network via Open Sound Control protocol</p>
+              <hr class="my-4">
+              <p class="lead" style="text-align: left">
+                <a class="btn btn-lg" style="background: #CDE7E3" href="/osc" role="button">Go to OSC panel</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="tab-pane fade" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab" tabindex="0">
+      <div class="position-relative">
+        <div class="position-absolute top-0 start-50 translate-middle-x" style="width: 70%">
+          <p class="fs-1">  About</p>
+          <p class="fs-5 lh-lg">Project for showing of different features of PWA and its technologies. This site uses all sorts of methods and technologies of progressive APPs to show tools that developers of sites have in their hands.</p>
+          <p class="fs-2">  Manifest</p>
+          <p class="fs-5 lh-lg">Web app manifest is a W3C specification defining a JSON-based manifest.</p>
+          <p class="fs-2">  WebAssembly</p>
+          <p class="fs-5 lh-lg">WebAssembly allows precompiled code to run in a web browser, at near-native speed. In this site I used Python integration based on Pyodide and imported such libraries as: Plotly, Pandas, python-osc, SocketIO and so on.</p>
+          <p class="fs-2">  Service worker</p>
+          <p class="fs-5 lh-lg">A service worker is a web worker that implements a programmable network proxy that can respond to web/HTTP requests from the main document. It is able to check the availability of a remote server, cache content when that server is available, and serve that content later to the document. Service workers, like any other web workers, work separately from the main document context.</p>
+        </div>
+      </div>
+    </div>
+</div>
+<div style="background-image: url('/static/background_1.png'); height: 500px"></div>
+{% endblock %}

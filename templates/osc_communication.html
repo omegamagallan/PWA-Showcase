@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>OSC Communication with Pyodide</h1>
+
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="ip-address" placeholder="Enter IP address of the device in the local network">
+        <label for="ip-address">IP Address</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="port" placeholder="Enter Port (standard is 5005)" value="5005">
+        <label for="port">Port</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="osc-address" placeholder="/test" value="/test">
+        <label for="osc-address">OSC Address</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="osc-value" placeholder="Enter value" value="42">
+        <label for="osc-value">OSC Value</label>
+    </div>
+    <button class="btn btn-primary mb-3" onclick="sendOscMessage()">Send OSC Message</button>
+    <div class="form-floating mb-3">
+        <textarea class="form-control" id="console-log" style="height: 150px" disabled></textarea>
+        <label for="console-log">Console Log</label>
+    </div>
+    <div class="form-floating mb-3">
+        <textarea class="form-control" id="received-messages" style="height: 150px" disabled></textarea>
+        <label for="received-messages">Received Messages</label>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let pyodideReadyPromise = loadPyodide();
+    const socket = io('http://localhost:5000');
+    const OSC = require('osc-js')
+
+    const plugin = new OSC.WebsocketClientPlugin({ host: '127.0.0.1', port: 5005 })
+    const oscClient = new OSC({ plugin: plugin })
+<!--    oscClient.open()-->
+
+<!--    const oscClient = new osc({-->
+<!--        plugin: new osc.WebsocketBrowserPlugin({-->
+<!--            // Configure the WebSocket server address and port-->
+<!--            host: '127.0.0.1', // The IP address of the WebSocket server-->
+<!--            port: 5005 // The port of the WebSocket server-->
+<!--        })-->
+<!--    });-->
+
+    oscClient.open(); // Open the WebSocket connection
+
+    function logMessage(message) {
+        const consoleLog = document.getElementById('console-log');
+        consoleLog.value += message + "\n";
+        consoleLog.scrollTop = consoleLog.scrollHeight; // Scroll to the bottom
+    }
+
+    function logReceivedMessage(message) {
+        const receivedMessages = document.getElementById('received-messages');
+        receivedMessages.value += message + "\n";
+        receivedMessages.scrollTop = receivedMessages.scrollHeight; // Scroll to the bottom
+    }
+
+    function sendOscMessage() {
+        const ip = document.getElementById('ip-address').value;
+        const port = document.getElementById('port').value;
+        const address = document.getElementById('osc-address').value;
+        const value = document.getElementById('osc-value').value;
+
+        const message = new OSC.Message(address, value);
+        oscClient.send(message, { host: ip, port: port });
+
+        logMessage(`Sent OSC message to ${ip}:${port} - ${address} ${value}`);
+    }
+
+    oscClient.on('/test', message => {
+        const { address, args } = message;
+        logReceivedMessage(`Received OSC message: ${address} ${args}`);
+        socket.emit('osc_message', { address, value: args });
+    });
+
+    socket.on('osc_message', function (data) {
+        logReceivedMessage(`Received OSC message: ${data.address} ${data.value}`);
+    });
+
+    async function startPyodide() {
+        await pyodideReadyPromise;
+        console.log('Pyodide is ready');
+        logMessage('Pyodide is ready');
+    }
+
+    startPyodide();
+</script>
+{% endblock %}

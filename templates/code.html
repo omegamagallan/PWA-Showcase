@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <h1 class="mt-5">Run Python Code with Pyodide and Plotly</h1>
+
+    <div class="hstack gap-3">
+
+        <div class="form-floating mb-3" style="width: 28rem; background: #CDE7E3">
+            <textarea class="form-control" placeholder="Write your Python code here" id="python-code" style="height: 150px">{{ default_code | safe }}</textarea>
+            <label for="python-code">Python Code</label>
+        </div>
+
+        <div class="vr" style="padding: 5 px"></div>
+
+        <div>
+            <div class="form-floating mb-3" style="width: 28rem; background: #CDE7E3">
+                <textarea class="form-control" placeholder="Console Log" id="console-log" style="height: 150px" disabled></textarea>
+                <label for="console-log">Console Log</label>
+
+
+            </div>
+            <button class="btn btn-lg mb-3" style="background: #CDE7E3" onclick="runPythonCode()">Run Python Code</button>
+        </div>
+    </div>
+
+    <div id="output" style="width: 600px; height: 400px;"></div>
+
+    <script type="text/javascript">
+        let pyodideReadyPromise;
+
+        function logMessage(message) {
+            let consoleLog = document.getElementById('console-log');
+            consoleLog.value += message + "\n";
+            consoleLog.scrollTop = consoleLog.scrollHeight; // Scroll to the bottom
+        }
+
+        async function loadPyodideAndPackages() {
+            if (!pyodideReadyPromise) {
+                logMessage("Loading Pyodide...");
+                pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+                    logMessage("Pyodide loaded.");
+                    logMessage("Loading packages: micropip, plotly, pandas...");
+                    await pyodide.loadPackage('micropip');
+                    await pyodide.runPythonAsync(`
+                        import micropip
+                        await micropip.install('plotly')
+                        await micropip.install('pandas')
+                    `);
+                    logMessage("Packages loaded.");
+                    return pyodide;
+                });
+            }
+            return pyodideReadyPromise;
+        }
+
+        async function runPythonCode() {
+            let pyodide = await loadPyodideAndPackages();
+            let code = document.getElementById('python-code').value;
+            logMessage("Running Python code...");
+
+            try {
+                let output = await pyodide.runPythonAsync(code);
+                let outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = output;
+                logMessage("Execution successful.");
+
+                // Re-evaluate the script tags within the inserted HTML
+                let scripts = outputDiv.getElementsByTagName('script');
+                for (let script of scripts) {
+                    let newScript = document.createElement('script');
+                    newScript.text = script.text;
+                    document.head.appendChild(newScript).parentNode.removeChild(newScript);
+                }
+            } catch (error) {
+                document.getElementById('output').innerHTML = '';
+                logMessage(`Error: ${error.message}`);
+            }
+        }
+    </script>
+</div>
+{% endblock %}
